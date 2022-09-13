@@ -14,24 +14,27 @@ BibTeX:
         journal={Seismica},
     }
 
-Zenodo link here
+Original training datasets can be found at [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7075919.svg)](https://doi.org/10.5281/zenodo.7075919)
 
 ## Requirements
 
 In order to run the scripts you will need [Obspy](https://docs.obspy.org/) (I have version 1.3.0), [Tensorflow](https://www.tensorflow.org/) (I have version 2.8.1), Keras (2.8.0), and other standard python utilities such as numpy, scipy, and matplotlib.  I recommend creating a [conda](https://docs.conda.io/en/latest/) environment and installing packages into it.    
 
 ## File Descriptions
-* gnss_denoiser_3comp_v1.py - training script for model 1 (described in above reference) 
-* gnss_denoiser_3comp_v2.py - training script for model 2 (described in above reference) 
-* gnss_denoiser_3comp_v3.py - training script for model 3 (described in above reference) 
+* gnss\_denoiser\_3comp\_v1.py - training script for model 1 (described in above reference) 
+* gnss\_denoiser\_3comp\_v2.py - training script for model 2 (described in above reference) 
+* gnss\_denoiser\_3comp\_v3.py - training script for model 3 (described in above reference) 
 * gnss_tools.py - extra utilities for unets, scripts to calculate performance metrics, etc.
-* nd3_data_subset.hdf5 - fakequakes synthetic earthquakes, N=10000
-* 729k_noise_subset.hdf5 - noise samples, N=10000
-* softlayers_subset.hdf5 - fakequakes synthetic earthquakes with soft layers, N=10000
+* nd3\_data\_subset.hdf5 - fakequakes synthetic earthquakes, N=10000.  This is a subset of the training and testing data. Full versions are available at the Zenodo link above.
+* 729k\_noise\_subset.hdf5 - noise samples, N=10000. This is a subset of the training and testing data. Full versions are available at the Zenodo link above.
+* softlayers\_subset.hdf5 - fakequakes synthetic earthquakes with soft layers, N=10000. This is a subset of the training and testing data. Full versions are available at the Zenodo link above.
+* quickie\_3comp\_norm\_input\_v2\_4\_8-18.tf - trained models, output name quickie\_3comp\_norm\_input\_v[X]\_[fac]\_[month]-[day].tf where X is the model version, fac is the model size set in the header of the gnss\_denoiser\_3comp\_vX.py script, month and day correspond to the date the model began training.
+
 
 ## File usage
-The gnss_denoiser_3comp_vX.py scripts are the drivers.  Each script has a # SET OPTIONS section in the header with the following options:  
-* Setting Train=True in the file header will train a new model with output name quickie_3comp_norm_input_v[X]_[fac]_[month]-[day].tf where X is the model version, fac is the model size set in the header of the gnss_denoiser_3comp_vX.py script, month and day correspond to the date the model began training
+The gnss\_denoiser\_3comp\_vX.py scripts are the drivers where X is the model version.  Each script has a # SET OPTIONS section in the header with the following options:  
+
+* Setting Train=True in the file header will train a new model with output name quickie\_3comp\_norm\_input\_v[X]\_[fac]\_[month]-[day].tf where X is the model version, fac is the model size set in the header of the gnss_denoiser_3comp_vX.py script, month and day correspond to the date the model began training
 * plots makes various plots that were useful in developing the models (True)
 * epos is the number of epochs to train for (50)
 * fac is the model size (2 or 4 are used in the manuscript)
