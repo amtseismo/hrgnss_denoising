@@ -29,7 +29,9 @@ In order to run the scripts you will need [Obspy](https://docs.obspy.org/) (I ha
 * 729k\_noise\_subset.hdf5 - noise samples, N=10000. This is a subset of the training and testing data. Full versions are available at the Zenodo link above.
 * softlayers\_subset.hdf5 - fakequakes synthetic earthquakes with soft layers, N=10000. This is a subset of the training and testing data. Full versions are available at the Zenodo link above.
 * quickie\_3comp\_norm\_input\_v2\_4\_8-18.tf - trained models, output name quickie\_3comp\_norm\_input\_v[X]\_[fac]\_[month]-[day].tf where X is the model version, fac is the model size set in the header of the gnss\_denoiser\_3comp\_vX.py script, month and day correspond to the date the model began training.
-
+* v1\_plot.h5.svg -  Figure of Model 1 architecture. 
+* v2\_plot.h5.svg -  Figure of Model 2 architecture. 
+* v3\_plot.h5.svg -  Figure of Model 3 architecture. 
 
 ## File usage
 The gnss\_denoiser\_3comp\_vX.py scripts are the drivers where X is the model version.  Each script has a # SET OPTIONS section in the header with the following options:  
