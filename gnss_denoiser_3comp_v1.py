@@ -97,8 +97,6 @@ x,y,sigs,noise,x1=next(my_test_data)
 # BUILD THE MODEL
 print("BUILD THE MODEL")
 model=gnss_tools.make_small_unet_v1(drop=drop,ncomp=3,fac=fac)
-
-'''
         
 # ADD SOME CHECKPOINTS
 print("ADDING CHECKPOINTS")
@@ -148,6 +146,7 @@ goto=maxrange
 with open('model1_v'+str(fac)+'_results.pkl', 'wb') as f:  # Python 3: open(..., 'wb')
     pickle.dump([x[:goto,:,:,:],y[:goto,:,:,:],sigs[:goto,:],noise[:goto,:],x1[:goto,:,:,:],test_predictions[:goto,:,:,:]], f)
 
+'''
 # # CALCULATE SOME METRICS
 # # VR=np.zeros((int(maxrange),3))
 # SNR=np.zeros((int(maxrange),3))
