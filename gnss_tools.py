@@ -511,7 +511,7 @@ def make_small_unet_v1(drop=0, ncomp=1, fac=1):
     model.compile(loss='mse',optimizer=opt,metrics=['mse'])
     
     model.summary()
-    
+
     tf.keras.utils.plot_model(model, to_file='denoising_model_v1_plot.png', show_shapes=True, show_layer_names=True)
     
     return model
