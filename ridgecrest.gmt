@@ -1,0 +1,124 @@
+#!/bin/bash
+
+gmtset MAP_SCALE_HEIGHT 10p
+
+range="-118/-117.1/35.3/36.2"
+largerange="-121.25/-114.01/32.75/38.25"
+J="M4i"
+out="ridgecrest.ps"
+\rm $out
+
+# # splice the grid together
+# gmt6 grdblend /Users/amt/Documents/GMT_scripts/topography/USGS_1_n35w116.tiff /Users/amt/Documents/GMT_scripts/topography/USGS_1_n36w116.tiff /Users/amt/Documents/GMT_scripts/topography/USGS_1_n37w116.tiff -Gridgecrest116.grd -I1s -R-116/-115/34/37 -V
+# gmt6 grdblend /Users/amt/Documents/GMT_scripts/topography/USGS_1_n35w117.tiff /Users/amt/Documents/GMT_scripts/topography/USGS_1_n36w117.tiff /Users/amt/Documents/GMT_scripts/topography/USGS_1_n37w117.tiff -Gridgecrest117.grd -I1s -R-117/-116/34/37 -V
+# gmt6 grdblend /Users/amt/Documents/GMT_scripts/topography/USGS_1_n35w118.tiff /Users/amt/Documents/GMT_scripts/topography/USGS_1_n36w118.tiff /Users/amt/Documents/GMT_scripts/topography/USGS_1_n37w118.tiff -Gridgecrest118.grd -I1s -R-118/-117/34/37 -V
+# gmt6 grdblend /Users/amt/Documents/GMT_scripts/topography/USGS_1_n35w119.tiff /Users/amt/Documents/GMT_scripts/topography/USGS_1_n36w119.tiff /Users/amt/Documents/GMT_scripts/topography/USGS_1_n37w119.tiff -Gridgecrest119.grd -I1s -R-119/-118/34/37 -V
+#grdblend ridgecrest119.grd ridgecrest118.grd ridgecrest117.grd ridgecrest116.grd -Gridgecrestbig.grd -I1s -R-119/-115/34/37 -V
+
+# # resample
+# gmt6 grdsample ridgecrestbig.grd -Gridgecrest_resamp.grd -I10s -R-119/-115/34/37
+
+# # Get the topo/bathymetry
+# grdcut ridgecrestbig.grd -Gridgecrest.grd -R$range -V
+# grdcut ridgecrest_resamp.grd -Gridgecrest1.grd -R$largerange -V
+# gmt6 grdcut /Users/amt/Documents/GMT_scripts/topography/w_na.nc -Gridgecrest1.grd -R$largerange -V
+
+# check minimum and maximum values of z and set them
+# grdinfo ridgecrest.grd
+
+# Make topography color palette
+# gmt6 makecpt -D -Cgray -T-200/4745/10 -Ic > topo.cpt
+# /Users/amt/Documents/GMT_scripts/colorpalettes/
+# # Make a shading map for topo and bath
+#gmt6 grdgradient ridgecrest.grd -A0/0 -Gtopograd.grd -Ne0.8 -V
+#gmt6 grdgradient ridgecrest1.grd -A0/0 -Gtopograd1.grd -Ne0.8 -V
+
+# ------------------------------------------ plot ridgecrest area map
+gmt6 grdimage ridgecrest.grd -R$range -J$J -Ctopo.cpt -Itopograd.grd -X12c -Q -K -B0.5wESn > ${out}
+
+# next add seismicity
+awk '{if (NR>25 && $13>2) print $8,$7,$9,$13/29}' shelly_quakes.dat |\
+gmt6 psxy -R -J -Sc -Ccasdep.cpt -B -O -K -W0.25p >> ${out}
+
+# GNSS stations
+gmt6 psxy RC_grid.gflist -: -R -J -Si0.3c -G162/210/255 -W0.1p,0/0/0 -O -K >> ${out}
+gmt6 psxy GNSS_stas_nolabel.txt -R$range -J$J -Si0.5c -G255/175/204 -W0.1p,0/0/0 -K -O >> ${out}
+gmt6 pstext GNSS_stas.txt -R$range -J$J -D0/0.45 -F+f11,Arial-Bold,black -O -K >> ${out}
+
+
+# plot some moment tensors
+echo -117.498625 35.708350 15.054 228 66 4 6.4 0.0 0.0 M6.4 |\
+gmt6 psmeca -R -J -Sa0.5/14/5 -O -V -K -F+f12,Arial-Bold,black -C1 << EOF >> ${out}
+-117.498625 35.708350 15.054 228 66 4 6.4 -117.4 35.78 M6.4
+-117.594157 35.771818 3.241 322 81 -173 7.1 -117.7 35.7 M7.1
+EOF
+
+gmt6 gmtset FONT_LABEL 10p FONT_ANNOT_PRIMARY 10p
+
+# add depth scale
+gmt6 psscale -DjCT+w6c/0.3c+o0/0.5c+h -F+gwhite+p1 -O -K -Ccasdep.cpt -Baf+l"Depth (km)" -R -J >> ${out}
+
+echo "36.15 -117.15 B" |\
+gmt6 pstext -R -J -: -F+f24,Helvetica-Bold,black -Gwhite -O -K >> ${out}
+
+
+
+# ------------------------------------------ plot the first bit of map ------------------------------------------
+J="M3.9i"
+gmt6 grdimage ridgecrest1.grd -R$largerange -J$J -Ctopo.cpt -Itopograd1.grd -Q -K -O -X-9c -Y2.75c -B2WesN >> ${out}
+
+# next add seismicity
+awk '{if (NR>25 && $13>2) print $8,$7,$9,$13/29}' shelly_quakes.dat |\
+gmt6 psxy -R$largerange -J -Sc -Ccasdep.cpt -B -O -K -W0.25p >> ${out}
+
+## GNSS stations
+# blue 162/210/255
+# pink 255/175/204
+gmt6 psxy GNSS_stas_nolabel.txt -R -J -Si0.3c -G255/175/204 -W0.1p,0/0/0 -O -K >> ${out}
+#awk '{print $2, $3}' close_w_coords.dat |\
+#gmt6 psxy  -R -J -Si0.3c -G255/175/204 -W0.1p,0/0/0 -W0.5p -O -K >> ${out}
+grep P570 GNSS_stas.txt | gmt6 pstext  -R -J -D0/-0.5+v1p -F+f10,Arial-Bold=~1.5,white -O -K >> ${out}
+grep ISLK GNSS_stas.txt | gmt6 pstext  -R -J -D0/0.5+v1p -F+f10,Arial-Bold=~1.5,white -O -K >> ${out}
+
+gmt6 psxy -R -J -W1p,0/0/0 -O -K << EOF >> ${out}
+-118 35.3
+-117.1 35.3
+-117.1 36.2
+-118 36.2
+-118 35.3
+EOF
+
+echo "37.85 -120.75 A" |\
+pstext -R -J -: -F+f24,Helvetica-Bold,black -Gwhite -O -K >> ${out}
+
+#Outline
+psxy ca.xy -: -Jm0.09i -R-125/-114/32/43 -Gwhite -W1p,black -K -O -B+n -Y6c -X7c >> ${out}
+echo "39 -118 CA" |\
+pstext -R -J -: -F+f14,Helvetica-Bold,black -O -K -D-0.5/-0.5 -B+n >> ${out}
+# Ridgecrest
+echo "35.771818 -117.594157" |\
+psxy -R -J -Ss0.3 -: -G205/180/219 -W1p,black -O -K -B+n >> ${out}
+
+
+# add some faults
+# gmt6 psxy ../topography/CFM5.3_blind.lonLat -R -J -O -K -W1p,255/185/15 -Sqn2:+f8p+Lh+o >> ${out}
+
+# # Make a legend
+gmt6 pslegend -R -J -Dx-2.8i/-3.65i+w3i/1i+jBL+l1.2 -C0.1i/0.1i -O -K << EOF >> ${out}
+# Legend test for pslegend
+# G is vertical gap, V is vertical line, N sets # of columns, D draws horizontal line.
+# H is header, L is label, S is symbol, T is paragraph text, M is map scale.
+#
+G -0.1i
+N 1
+S 0.1i c 0.15i 216/110/179 0.25p 0.3i Earthquake
+S 0.1i i 0.15i 255/175/204 0.25p 0.3i GNSS station used for noise recordings
+S 0.1i i 0.15i 162/210/255 0.25p 0.3i Synthetic GNSS station used for signal
+G 0.1i
+P
+EOF
+
+open -a Preview $out
+
+
+
